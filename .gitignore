@@ -1,0 +1,7 @@
+_build
+*.plugin
+*.o
+*.swp
+*~
+resources/main_1
+resources/main_2
