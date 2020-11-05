@@ -5,7 +5,7 @@ Demo: loading 2 binary executables into BAP.
 Clone this repo somewhere:
 
     cd ~/code
-    git clone https://github.com/jtpaasch/load2demo...
+    git clone https://github.com/jtpaasch/load2demo.git
     cd load2demo
 
 Mount the code into the latest BAP docker container:
