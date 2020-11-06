@@ -29,6 +29,6 @@ loc_1   DB 0x3  ; Store 3 at an address called "loc_1"
 ;;  -----------------------------------------------------------------
 
 main:
-        mov rax, 0x3 ; Return 3
+        mov rax, [loc_1] ; Return 3
         ret
 .end:

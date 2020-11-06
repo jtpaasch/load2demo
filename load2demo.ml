@@ -25,28 +25,49 @@ module Cli = struct
   let name = "load2demo"
   let doc = "Demo: load two binaries into BAP"
 
+  let merge = Cmd.flag "merge" ~doc:"Let BAP merge the executables?"
+
   let exe_1 = Cmd.argument Typ.file ~doc:"Path to exe 1"
   let exe_2 = Cmd.argument Typ.file ~doc:"Path to exe 2"
 
-  let grammar = Cmd.(args $ exe_1 $ exe_2)
+  let grammar = Cmd.(args $ merge $ exe_1 $ exe_2)
 
-  let callback (exe_1 : string) (exe_2 : string) (ctxt : ctxt) 
-      : (unit, error) result =
-    print_endline exe_1;
-    print_endline exe_2;
+  let callback (merge : bool) (exe_1 : string) (exe_2 : string)
+      (ctxt : ctxt) : (unit, error) result =
 
-    let proj_1 = load exe_1 in
-    let proj_2 = load exe_2 in
+    let prog_1, prog_2 = match merge with
+      | true ->
+        begin
 
-    let prog_1 = Project.program proj_1 in
-    let prog_2 = Project.program proj_2 in
+          let proj_1 = load exe_1 in
+          let proj_2 = load exe_2 in
+
+          let prog_1 = Project.program proj_1 in
+          let prog_2 = Project.program proj_2 in
+
+          (prog_1, prog_2)
+
+        end
+      | false ->
+        begin
+
+          let proj_1 = load exe_1 in
+          let prog_1 = Project.program proj_1 in
+
+          let proj_2 = load exe_2 in
+          let prog_2 = Project.program proj_2 in
+
+          (prog_1, prog_2)
+
+        end
+    in
 
     let main_1 = get_sub prog_1 "main" in
     let main_2 = get_sub prog_2 "main" in
 
-    print_endline "=== MAIN_1 ============================";
+    print_endline "=== MAIN (First EXE) ============================";
     Format.printf "%a\n%!" Sub.pp main_1;
-    print_endline "=== MAIN_2 ============================";
+    print_endline "=== MAIN (Second EXE) ===========================";
     Format.printf "%a%!" Sub.pp main_2;
 
     Ok ()
