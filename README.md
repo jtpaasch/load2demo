@@ -111,7 +111,7 @@ Run each one, to confirm that they produce the expected exit codes:
     > echo $? # returns 3
 
 Semantically, `main_1` and `main_2` are similar, except they put a different
-literal value into `rax` before returning. 
+literal/immediate value into `rax` before returning. 
 
 By contrast, `main_2` and `main_3` are similar, except `main_2` puts the value 
 `0x3` directly into `rax`, while `main_3` gets that same value from memory.
@@ -131,7 +131,7 @@ let load (filename : string) : Project.t =
   | Error e -> failwith @@ Error.to_string_hum e
 ```
 
-Suppose you use this function to load two binary executables `exe_` and
+Suppose you use this function to load two binary executables `exe_1` and
 `exe_`2, one after the other, before you extract the programs from them. 
 Like this:
 
@@ -144,12 +144,12 @@ let prog_2 = Project.program proj_2 in
 ...
 ```
 
-When you run `load` twice like this, BAP merges the second program with 
-the first. It's as if BAP sort of overwrites the first one with information
-from the second one.
+When you run `load` twice like this, it looks like BAP merges the second 
+program with the first. It's as if BAP overwrites the first one with 
+information it gets from the second one.
 
-Let me try to confirm this. First, look at how BAP sees the `main` function of 
-the first program, `main_1`:
+Let me try to demonstrate why I think that. First, look at how BAP sees the 
+`main` function of the first program, `main_1`:
 
     bap resources/main_1 -d --print-symbol=main
 
@@ -248,7 +248,8 @@ authoritative version of that statement, since it was loaded second).
 
 ### Loading without merging
 
-To merge, we loaded the two executables back to back, like this:
+In the previous examples, I caused BAP to merge the two programs by loadeing 
+the two executables back to back, like this:
 
 ```
 let proj_1 = load exe_1 in
@@ -259,11 +260,11 @@ let prog_2 = Project.program proj_2 in
 ...
 ``` 
 
-Notice that we didn't _extract_ the programs from the projects until after
-we have loaded the two projects first.
+Notice that I didn't _extract_ the programs from the projects until after
+I loaded the two projects first.
 
 Let's do it differently. Let's load the first project and extract its program
-_before_ loading the second project. Like this:
+_before_ loading the second project and extracting its program. Like this:
 
 ```
 let proj_1 = load exe_1 in
@@ -274,10 +275,10 @@ let prog_2 = Project.program proj_2 in
 ...
 ``` 
 
-Doing it this way won't merge the programs.
+When doing things this way, BAP doesn't appear to merge the programs.
 
-To confirm, run the `load2demo` plugin on `main_1` and `main_2` this way
-(without using the `--merge` flag):
+To confirm, run the `load2demo` plugin on `main_1` and `main_2` without using
+the `--merge` flag:
 
     bap load2demo resources/main_1 resources/main_2 
 
@@ -306,10 +307,10 @@ When it's finished, the plugin prints the two `main` functions it's loaded:
 ```
 
 This time, the two programs are as one might expect. The first one has
-`RAX :=5`, and the second one has `RAX := 3`. 
+`RAX := 5`, and the second one has `RAX := 3`, just as it should be. 
 
 Also, notice that the TIDs are different. The second program has its own
-set of TIDs.
+set of TIDs, whereas before, the two `main` functions had the same TIDs.
 
 It would appear from this that, if you extract the program using
 `Project.program foo` before calling `load` again, things work as expected.
@@ -326,9 +327,9 @@ When merging `main_1` and `main_2` before, recall that BAP did not see
 any conflict in the values `5` and `3`, and it merged the second program
 into the first one, letting `3` overwrite `5` without any complaint.
 
-It would appear that BAP thinks the semantics of `RAX := 5` and `RAX := 3` 
-are equivalent, or at least it does not see a conflict here. Perhaps
-what BAP really sees is something like this: `RAX := Some constant`.
+Perhaps BAP thinks the semantics of `RAX := 5` and `RAX := 3` are equivalent, 
+or at least it does not see a conflict? Perhaps what BAP really sees is 
+something like this: `RAX := Some constant`?
 
 In any case, let's try the same thing with `main_2` and `main_3`. These two
 programs return the same value (`RAX` ends up with `3` stashed in it), but
@@ -429,9 +430,9 @@ into `RAX`:
 ```
 
 And BAP sees these two versions of the instruction as conflicting. That makes
-sense. The semantics of assigning a literal value to a register is different
-from the semantics of taking a value from a location in memory and putting it
-there.
+sense. The semantics of assigning a literal value to a register is presumably
+seen by BAP as different from the semantics of taking a value from a location
+in memory and putting it there.
 
 
 ### No conflicts
@@ -470,10 +471,11 @@ Here we see that the two programs are different, with distinct TIDs.
 
 ### TL;DR
 
-Loading more than one binary right after another tells BAP to merge the
+Loading two binaries one right after the other tells BAP to merge the
 info from the later loads into the info it has about the earlier loads.
 
-Extracting a program from a loaded project appears to be the moment when
-BAP sets up the program as a distinct entity in its internal memory. It's
-then that it assigns TIDs to the terms, and so on. Any loads after that 
-will be considered by BAP to be loading a new, different program.
+Extracting a program from a loaded project (i.e., when you call
+`Project.program`) appears to be the moment when BAP sets up the program as 
+a distinct entity in its internal memory. It's then that it assigns TIDs to 
+the terms, and so on. Any loads after that appear to be considered by BAP to
+be loading a new, different program.
