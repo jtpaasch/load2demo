@@ -32,9 +32,9 @@ Run it:
 
     bap load2demo resources/main_1 resources/main_2
 
-This will load the two programs, and print their `main` functions.
-The way it load these programs is roughly that it loads the first exe and
-calls `Project.program`, then it repeats that for the second exe:
+This will load the two programs, and print their `main` functions. The way it
+load these programs is: it loads the first exe and calls `Project.program`, 
+then it repeats that for the second exe. Roughly like this:
 
 ```
 let proj_1 = Project.create exe_1 in
@@ -42,8 +42,7 @@ let prog_1 = Project.program proj_1 in
 
 let proj_2 = Project.create exe_2 in
 let prog_2 = Project.program proj_2 in
-``` 
-
+...
 ``` 
 
 Alternatively, you can add a `--merge` flag when you call `load2demo`:
@@ -52,7 +51,7 @@ Alternatively, you can add a `--merge` flag when you call `load2demo`:
 
 This will also load the two programs and print their `main` functions, but
 the loading happens differently. With the `--merge` flag, the two exes are
-first loaded, and then `Project.program` is called on them. Like this:
+first loaded, and then `Project.program` is called on them. Roughly like this:
 
 ```
 let proj_1 = Project.create exe_1 in
@@ -61,6 +60,8 @@ let proj_2 = Project.create exe_2 in
 let prog_1 = Project.program proj_1 in
 let prog_2 = Project.program proj_2 in
 ...
+
+See [load2demo.ml](https://github.com/jtpaasch/load2demo/blob/main/load2demo.ml#L38-L63) for the actual code that does this.
 
 
 ## The examples
