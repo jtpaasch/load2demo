@@ -60,6 +60,7 @@ let proj_2 = Project.create exe_2 in
 let prog_1 = Project.program proj_1 in
 let prog_2 = Project.program proj_2 in
 ...
+```
 
 See [load2demo.ml](https://github.com/jtpaasch/load2demo/blob/main/load2demo.ml#L38-L63) for the actual code that does this.
 
