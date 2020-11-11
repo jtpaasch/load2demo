@@ -71,16 +71,16 @@ Load `resources/main_1` and `resources/main_2`:
 
     bap load2demo resources/main_1 resources/main_2
 
-In the printed result, you'll see that the two functions each have their
-own set of TIDs, and `main_1` returns `RAX := 3` while `main_2` returns
-`RAX := 5`, just as in the assembly `resources/main_1.asm` and
-`resources/main_2.asm`.
+In the printed result, I see that the respective `main` functions each have 
+their own set of TIDs, and `main_1` returns `RAX := 3` while `main_2` returns
+`RAX := 5`, just as in the assembly [resources/main_1.asm](https://github.com/jtpaasch/load2demo/blob/main/resources/main_1.asm#L32) 
+and [resources/main_2.asm](https://github.com/jtpaasch/load2demo/blob/main/resources/main_2.asm#L32).
 
 Now try it with the `--merge` flag:
 
     bap load2demo resources/main_1 resources/main_2 --merge
 
-This time, the two functions look exactly alike. They have the same TIDs,
+This time, the two `main` functions look exactly alike. They have the same TIDs,
 and both have `RAX := 3`. It's as if the second program overwrites the first.
 
 (It's not clear to me why there's no conflict between `RAX := 3` and
@@ -90,10 +90,10 @@ Now load `resources/main_2` and `resources/main_3`:
 
     bap load2demo resources/main_2 resources/main_3
 
-In the printed result, the two functions each have their own set of TIDs,
-and `main_2` returns `RAX := 3` while `main_3` returns
-`RAX := mem[0x601030, el]:u64`, just as in the assembly `resources/main_2.asm`
-and `resources/main_3.asm`. 
+In the printed result, the respective `main` functions each have their own set
+of TIDs, and `main_2` returns `RAX := 3` while `main_3` returns
+`RAX := mem[0x601030, el]:u64`, just as in the assembly [resources/main_2.asm](https://github.com/jtpaasch/load2demo/blob/main/resources/main_2.asm#L32)
+and [resources/main_3.asm](https://github.com/jtpaasch/load2demo/blob/main/resources/main_3.asm#L32). 
 
 Now try it with the `--merge` flag:
 
@@ -102,3 +102,6 @@ Now try it with the `--merge` flag:
 This time, BAP throws a conflict error, saying that the instructions conflict.
 Again, it as if BAP is trying to merge the second program over the top of
 the first one.
+
+I am not sure I understand why these two ways of loading differ. What
+exactly is happening here?
