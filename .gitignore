@@ -3,6 +3,3 @@ _build
 *.o
 *.swp
 *~
-resources/main_1
-resources/main_2
-resources/main_3
